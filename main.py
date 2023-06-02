@@ -4,7 +4,7 @@ class calculator(Tk):
     def __init__(self):
         super().__init__()
         self.title('Calculadora con Python')
-        self.geometry('400x750')
+        self.geometry('400x700')
         self.resizable(width=False,height=False)
 
         self.cantidad = 0
@@ -77,6 +77,7 @@ class calculator(Tk):
                 self.first = False
             else:
                 self.cantidad *= 1/valor
+                self.cantidad = self.final_number(self.cantidad)
             self.switch(self.cantidad, argument)
         elif argument == 'C':
             self.cantidad = 0
@@ -84,6 +85,7 @@ class calculator(Tk):
             self.switch(self.cantidad, argument)
         elif argument == '=':
             self.accion_boton(self.last_operation)
+            self.first = True
 
 calc = calculator()
 calc.mainloop()
