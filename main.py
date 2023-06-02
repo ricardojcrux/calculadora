@@ -1,164 +1,89 @@
 from tkinter import *
-import keyboard
 
-valor,i,termino = 0,0,''
-z = 0
-def block(x):
-	return 'break'
+class calculator(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title('Calculadora con Python')
+        self.geometry('400x750')
+        self.resizable(width=False,height=False)
 
-def barrido(x):
-	global z,i
-	if z == 0:
-		window.delete(0,END)
+        self.cantidad = 0
+        self.empty_window = True
+        self.first = True
+        self.buttons = [7,8,9,'+',4,5,6,'-',1,2,3,'∗','C',0,'=','÷']
+        self.last_operation = ''
 
-def funcion(x):
-	barrido(0)
-	global z
-	z += 1
-	window.insert(END,x)
+        self.title = Label(self, text='Calculadora',font=('Script MT Bold',40))
+        self.title.pack(pady=10)
 
-def limpiar():
-    global valor, i, termino, z
-    valor, i, z, termino = 0,0,0,''
-    window.delete(0,END)
-    window.insert(0,0)
+        self.window = Entry(self,width=40,font=('led calculator',30),bg='black',fg='white',justify=RIGHT)
+        self.window.pack(padx=25,pady=10)
+        self.window.insert(0,0)
+        self.window.bind('<Key>', lambda widget: 'break')
+
+        self.botones = Frame(self)
+        self.botones.pack(pady=10)
+
+        for i in range(4):
+            for j in range(4):
+                x = self.buttons[i*4+j]
+                boton = Button(self.botones, text=f'{x}', font=('Arial',40),height=1,width=2, command= lambda x=x: self.accion_boton(x))
+                boton.grid(padx=10,pady=10,row=i,column=j)
     
-def suma():
-	entrada = float(window.get())
-	global valor, i, termino, z
-	valor += entrada
-	window.delete(0,END)
-	i += 1
-	z += 1
-	termino = 'suma'
-    
-def resta():
-	entrada = float(window.get())
-	global valor, i, termino, z
-	if i == 0:
-		valor += entrada
-	else:
-		valor -= entrada
-	window.delete(0,END)
-	i += 1
-	z += 1
-	termino = 'resta'
-            
-def multiplicacion():
-	entrada = float(window.get())
-	global valor, i, termino, z
-	if i == 0:
-		valor += entrada
-	else:
-		valor *= entrada
-	window.delete(0,END)
-	i += 1
-	z += 1
-	termino = 'multiplicacion'
+    def final_number(self, number:float):
+        if abs(number) - abs(int(number)) == 0.0:
+            return round(number)
+        else:
+            return round(number,4)
 
-def division():
-	entrada = float(window.get())
-	global valor, i, termino, z
-	if i == 0:
-		valor += entrada
-	else:
-		valor = valor * (1 / entrada)
-	window.delete(0,END)
-	i += 1
-	z += 1
-	termino = 'division'
+    def switch(self, cantidad, argument):
+        self.window.delete(0,END)
+        self.window.insert(0,cantidad)
+        self.empty_window = True
+        self.last_operation = argument
 
-def igual():
-	global termino, valor, i, z
-	if termino == '':
-		valor = int(window.get())
-		window.insert(0,valor)
-	elif termino == 'suma':
-		suma()
-	elif termino == 'resta':
-		resta()
-	elif termino == 'multiplicacion':
-		multiplicacion()
-	elif termino == 'division':
-		division()
-	window.delete(0,END)
-	tag = abs(valor) - abs(int(valor))
-	if tag == 0.0:
-		window.insert(0,round(valor))
-	else:
-		window.insert(0,round(valor,5))
-	valor,i,z = 0,0,0
+    def accion_boton(self, argument):
+        number = list(range(0,10))
+        if argument in number:
+            if self.empty_window is True:
+                self.window.delete(0,END)
+                self.window.insert(0,argument)
+            else:
+                self.window.insert(END,argument)
+            self.empty_window = False
+            return
+        valor = self.final_number(float(self.window.get()))
+        if argument == '+':
+            self.cantidad += valor
+            self.switch(self.cantidad, argument)
+            self.first = False
+        elif argument == '-':
+            if self.first is True:
+                self.cantidad = valor
+                self.first = False
+            else:
+                self.cantidad -= valor
+            self.switch(self.cantidad, argument)    
+        elif argument == '∗':
+            if self.first is True:
+                self.cantidad = valor
+                self.first = False
+            else:
+                self.cantidad *= valor
+            self.switch(self.cantidad, argument)
+        elif argument == '÷':
+            if self.first is True:
+                self.cantidad = valor
+                self.first = False
+            else:
+                self.cantidad *= 1/valor
+            self.switch(self.cantidad, argument)
+        elif argument == 'C':
+            self.cantidad = 0
+            self.first = True
+            self.switch(self.cantidad, argument)
+        elif argument == '=':
+            self.accion_boton(self.last_operation)
 
-calc = Tk()
-calc.title('Calculadora con Python')
-calc.geometry('400x750')
-calc.resizable(width=False, height=False)
-
-title=Label(calc, text='Calculadora', font=('Script MT Bold',40))
-title.pack(pady=10)
-
-window=Entry(calc)
-window.config(width=40, font=('led calculator',30), bg='black', fg='white' ,justify=RIGHT)
-window.insert(0,0)
-window.bind('<Button-1>',barrido)
-window.bind('<Key>',block)
-window.pack(padx=25, pady=10)
-    
-first = Frame(calc)
-second = Frame(calc)
-third = Frame(calc)
-last = Frame(calc)
-first.pack(pady=10)
-second.pack(pady=10)
-third.pack(pady=10)
-last.pack(pady=10)
-
-siete = Button(first, text='7',font=('Arial',40), height=1, width=2, command = lambda: funcion(7))
-siete.pack(padx=10,pady=10, side=LEFT)
-
-ocho = Button(first, text='8',font=('Arial',40), height=1, width=2, command = lambda: funcion(8))
-ocho.pack(padx=10,pady=10, side=LEFT)
-
-nueve = Button(first, text='9',font=('Arial',40), height=1, width=2, command = lambda: funcion(9))
-nueve.pack(padx=10,pady=10, side=LEFT)
-
-mas = Button(first, text='+',font=('Arial',40), height=1, width=2, command=suma)
-mas.pack(padx=10,pady=10, side=LEFT)
-
-cuatro = Button(second, text='4',font=('Arial',40), height=1, width=2, command = lambda: funcion(4))
-cuatro.pack(padx=10,pady=10, side=LEFT)
-
-cinco = Button(second, text='5',font=('Arial',40), height=1, width=2, command = lambda: funcion(5))
-cinco.pack(padx=10,pady=10, side=LEFT)
-
-seis = Button(second, text='6',font=('Arial',40), height=1, width=2, command = lambda: funcion(6))
-seis.pack(padx=10,pady=10, side=LEFT)
-
-menos = Button(second, text='-',font=('Arial',40), height=1, width=2,command=resta)
-menos.pack(padx=10,pady=10, side=LEFT)
-
-uno = Button(third, text='1',font=('Arial',40), height=1, width=2, command = lambda: funcion(1))
-uno.pack(padx=10,pady=10, side=LEFT)
-
-dos = Button(third, text='2',font=('Arial',40), height=1, width=2, command = lambda: funcion(2))
-dos.pack(padx=10,pady=10, side=LEFT)
-
-tres = Button(third, text='3',font=('Arial',40), height=1, width=2, command = lambda: funcion(3))
-tres.pack(padx=10,pady=10, side=LEFT)
-
-por = Button(third, text='×',font=('Arial',40), height=1, width=2,command=multiplicacion)
-por.pack(padx=10,pady=10, side=LEFT)
-
-clear = Button(last, text='C',font=('Arial',40), height=1, width=2,command=limpiar)
-clear.pack(padx=10,pady=10, side=LEFT)
-
-cero = Button(last, text='0',font=('Arial',40), height=1, width=2, command = lambda: funcion(0))
-cero.pack(padx=10,pady=10, side=LEFT)
-
-igual = Button(last, text='=',font=('Arial',40), height=1, width=2, command= igual)
-igual.pack(padx=10,pady=10, side=LEFT)
-
-entre = Button(last, text='÷',font=('Arial',40), height=1, width=2, command= division)
-entre.pack(padx=10,pady=10, side=LEFT)
-
+calc = calculator()
 calc.mainloop()
