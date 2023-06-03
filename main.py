@@ -10,7 +10,10 @@ class calculator(Tk):
         self.cantidad = 0
         self.empty_window = True
         self.first = True
-        self.buttons = [7,8,9,'+',4,5,6,'-',1,2,3,'∗','C',0,'=','÷']
+        self.buttons = [[7,8,9,'+'],
+                        [4,5,6,'-'],
+                        [1,2,3,'∗'],
+                        ['C',0,'=','÷']]
         self.last_operation = ''
 
         self.title = Label(self, text='Calculadora',font=('Script MT Bold',40))
@@ -26,7 +29,7 @@ class calculator(Tk):
 
         for i in range(4):
             for j in range(4):
-                x = self.buttons[i*4+j]
+                x = self.buttons[i][j]
                 boton = Button(self.botones, text=f'{x}', font=('Arial',40),height=1,width=2, command= lambda x=x: self.accion_boton(x))
                 boton.grid(padx=10,pady=10,row=i,column=j)
     
@@ -60,7 +63,7 @@ class calculator(Tk):
             else:
                 self.cantidad += valor
             self.switch(self.cantidad, argument)
-            
+
         elif argument == '-':
             if self.first is True:
                 self.cantidad = valor
